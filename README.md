@@ -39,7 +39,22 @@ A short Android library to communicate with Arduino through usb.
         arduino.closeArduino();
         arduino.unregisterReceiver();
     }
-    
+
+# Arduino Side
+
+Example code which sends back every character received
+
+    void setup() {
+      Serial.begin(9600);
+    }
+
+    void loop() {
+      if(Serial.available()){
+        char c = Serial.read();
+        Serial.print(c);
+      }
+    }
+
 # Special thanks
 
 This code is using UsbSerial library : [https://github.com/felHR85/UsbSerial](https://github.com/felHR85/UsbSerial)
