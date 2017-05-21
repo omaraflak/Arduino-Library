@@ -45,14 +45,14 @@ A short Android library to communicate with Arduino through usb.
 Example code which sends back every character received
 
     void setup() {
-      Serial.begin(9600);
+        Serial.begin(9600);
     }
 
     void loop() {
-      if(Serial.available()){
-        char c = Serial.read();
-        Serial.print(c);
-      }
+        if(Serial.available()){
+            char c = Serial.read();
+            Serial.print(c);
+        }
     }
 
 # Sample Code
