@@ -7,7 +7,7 @@ A short Android library to communicate with Arduino through usb.
 
 # Usage
 
-    Arduino arduino = new Arduino(this);
+    Arduino arduino = new Arduino(Context);
     arduino.registerReceiver(new ArduinoListener() {
         @Override
         public void onArduinoAttached(UsbDevice device) {
@@ -54,6 +54,10 @@ Example code which sends back every character received
         Serial.print(c);
       }
     }
+
+# Sample Code
+
+See **[MainActivity.java](https://github.com/omaflak/Arduino/blob/master/app/src/main/java/me/aflak/libraries/MainActivity.java)**
 
 # Special thanks
 
