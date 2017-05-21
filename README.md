@@ -3,6 +3,17 @@ A short Android library to communicate with Arduino through usb.
 
 # Gradle
 
+build.gradle Project
+
+    allprojects {
+        repositories {
+            jcenter()
+            maven { url "https://jitpack.io" }
+        }
+    }
+
+build.gradle Module
+
     compile 'me.aflak.libraries:arduino:X.X'
 
 # Usage
