@@ -1,0 +1,132 @@
+package me.aflak.arduino;
+
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
+
+import com.felhr.usbserial.UsbSerialDevice;
+import com.felhr.usbserial.UsbSerialInterface;
+
+/**
+ * Created by Omar on 21/05/2017.
+ */
+
+public class Arduino implements UsbSerialInterface.UsbReadCallback{
+    private Context context;
+    private ArduinoListener listener;
+
+    private UsbDeviceConnection connection;
+    private UsbSerialDevice serialPort;
+    private UsbReceiver usbReceiver;
+    private UsbManager usbManager;
+
+    private static final String ACTION_USB_DEVICE_PERMISSION = "me.aflak.arduino.USB_PERMISSION";
+    private static final int ARDUINO_VENDOR_ID = 9025;
+
+    public Arduino(Context context) {
+        this.context = context;
+        usbReceiver = new UsbReceiver();
+        usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        intentFilter.addAction(ACTION_USB_DEVICE_PERMISSION);
+        context.registerReceiver(usbReceiver, intentFilter);
+    }
+
+    public void registerReceiver(ArduinoListener listener){
+        this.listener = listener;
+    }
+
+    public void unregisterReceiver(){
+        context.unregisterReceiver(usbReceiver);
+    }
+
+    public void open(UsbDevice device){
+        PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_DEVICE_PERMISSION), 0);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_USB_DEVICE_PERMISSION);
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        context.registerReceiver(usbReceiver, filter);
+        usbManager.requestPermission(device, permissionIntent);
+    }
+
+    public void sendMessage(byte[] bytes){
+        if(serialPort!=null){
+            serialPort.write(bytes);
+        }
+    }
+
+    public void closeArduino(){
+        if(serialPort!=null){
+            serialPort.close();
+        }
+        if(connection!=null){
+            connection.close();
+        }
+    }
+
+    private class UsbReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            UsbDevice device;
+
+            switch (intent.getAction()){
+                case UsbManager.ACTION_USB_DEVICE_ATTACHED:
+                    device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (device.getVendorId()==ARDUINO_VENDOR_ID)
+                    {
+                        if(listener!=null){
+                            listener.onArduinoAttached(device);
+                        }
+                    }
+                    break;
+                case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                    device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (device.getVendorId()==ARDUINO_VENDOR_ID)
+                    {
+                        if(listener!=null){
+                            listener.onArduinoDetached();
+                        }
+                    }
+                    break;
+                case ACTION_USB_DEVICE_PERMISSION:
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                        if(device.getVendorId()==ARDUINO_VENDOR_ID){
+                            connection = usbManager.openDevice(device);
+                            serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection);
+                            if(serialPort != null){
+                                if(serialPort.open()){
+                                    serialPort.setBaudRate(9600);
+                                    serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
+                                    serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
+                                    serialPort.setParity(UsbSerialInterface.PARITY_NONE);
+                                    serialPort.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
+                                    serialPort.read(Arduino.this);
+
+                                    if(listener != null){
+                                        listener.onArduinoOpened();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onReceivedData(byte[] bytes) {
+        if(listener != null && bytes.length!=0){
+            listener.onArduinoMessage(bytes);
+        }
+    }
+}
