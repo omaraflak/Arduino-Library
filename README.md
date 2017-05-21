@@ -1,4 +1,4 @@
-# Arduino
+# Arduino [ ![Download](https://api.bintray.com/packages/omaflak/maven/arduino/images/download.svg) ](https://bintray.com/omaflak/maven/arduino/_latestVersion)
 A short Android library to communicate with Arduino through usb.
 
 # Gradle
