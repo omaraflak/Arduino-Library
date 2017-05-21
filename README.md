@@ -3,7 +3,7 @@ A short Android library to communicate with Arduino through usb.
 
 # Gradle
 
-    compile 'me.aflak.libraries:arduino:1.0'
+    compile 'me.aflak.libraries:arduino:X.X'
 
 # Usage
 
