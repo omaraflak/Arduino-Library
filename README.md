@@ -19,36 +19,41 @@ build.gradle Module
 # Usage
 
     Arduino arduino = new Arduino(Context);
-    arduino.registerReceiver(new ArduinoListener() {
-        @Override
-        public void onArduinoAttached(UsbDevice device) {
-            arduino.open(device);
-        }
 
-        @Override
-        public void onArduinoDetached() {
-            // arduino detached from phone
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        arduino.setArduinoListener(new ArduinoListener() {
+	        @Override
+	        public void onArduinoAttached(UsbDevice device) {
+	            arduino.open(device);
+	        }
 
-        @Override
-        public void onArduinoMessage(byte[] bytes) {
-            String message = new String(bytes);
-            // new message received from arduino
-        }
+	        @Override
+	        public void onArduinoDetached() {
+	            // arduino detached from phone
+	        }
 
-        @Override
-        public void onArduinoOpened() {
-            // you can start the communication
-            String str = "Hello Arduino !";
-            arduino.sendMessage(str.getBytes());
-        }
-    });
+	        @Override
+	        public void onArduinoMessage(byte[] bytes) {
+	            String message = new String(bytes);
+	            // new message received from arduino
+	        }
+
+	        @Override
+	        public void onArduinoOpened() {
+	            // you can start the communication
+	            String str = "Hello Arduino !";
+	            arduino.sendMessage(str.getBytes());
+	        }
+    	});
+    }
     
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        arduino.closeArduino();
-        arduino.unregisterReceiver();
+        arduino.unsetArduinoListener();
+        arduino.close();
     }
 
 # Arduino Side
