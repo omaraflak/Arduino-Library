@@ -25,6 +25,8 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
     private UsbReceiver usbReceiver;
     private UsbManager usbManager;
 
+    private boolean isOpened;
+
     private static final String ACTION_USB_DEVICE_PERMISSION = "me.aflak.arduino.USB_PERMISSION";
     private static final int ARDUINO_VENDOR_ID = 9025;
 
@@ -33,6 +35,8 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         usbReceiver = new UsbReceiver();
         usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 
+        isOpened = false;
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
@@ -40,12 +44,12 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         context.registerReceiver(usbReceiver, intentFilter);
     }
 
-    public void registerReceiver(ArduinoListener listener){
+    public void setArduinoListener(ArduinoListener listener){
         this.listener = listener;
     }
 
-    public void unregisterReceiver(){
-        context.unregisterReceiver(usbReceiver);
+    public void unsetArduinoListener(){
+        this.listener = null;
     }
 
     public void open(UsbDevice device){
@@ -57,18 +61,21 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         usbManager.requestPermission(device, permissionIntent);
     }
 
-    public void sendMessage(byte[] bytes){
-        if(serialPort!=null){
-            serialPort.write(bytes);
-        }
-    }
-
-    public void closeArduino(){
+    public void close(){
         if(serialPort!=null){
             serialPort.close();
         }
         if(connection!=null){
             connection.close();
+        }
+
+        isOpened = false;
+        context.unregisterReceiver(usbReceiver);
+    }
+
+    public void sendMessage(byte[] bytes){
+        if(serialPort!=null){
+            serialPort.write(bytes);
         }
     }
 
@@ -111,6 +118,8 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
                                     serialPort.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
                                     serialPort.read(Arduino.this);
 
+                                    isOpened = true;
+
                                     if(listener != null){
                                         listener.onArduinoOpened();
                                     }
@@ -128,5 +137,9 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         if(listener != null && bytes.length!=0){
             listener.onArduinoMessage(bytes);
         }
+    }
+
+    public boolean isOpened() {
+        return isOpened;
     }
 }

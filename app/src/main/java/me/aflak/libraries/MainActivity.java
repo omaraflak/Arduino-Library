@@ -4,7 +4,6 @@ import android.hardware.usb.UsbDevice;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import me.aflak.arduino.Arduino;
 import me.aflak.arduino.ArduinoListener;
@@ -19,16 +18,20 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         setContentView(R.layout.activity_main);
 
         textView = (TextView) findViewById(R.id.textView);
-
         arduino = new Arduino(this);
-        arduino.registerReceiver(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        arduino.setArduinoListener(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        arduino.closeArduino();
-        arduino.unregisterReceiver();
+        arduino.unsetArduinoListener();
+        arduino.close();
     }
 
     @Override
