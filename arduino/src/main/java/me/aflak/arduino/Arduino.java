@@ -36,16 +36,16 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 
         isOpened = false;
+    }
+
+    public void setArduinoListener(ArduinoListener listener){
+        this.listener = listener;
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         intentFilter.addAction(ACTION_USB_DEVICE_PERMISSION);
         context.registerReceiver(usbReceiver, intentFilter);
-    }
-
-    public void setArduinoListener(ArduinoListener listener){
-        this.listener = listener;
     }
 
     public void unsetArduinoListener(){
