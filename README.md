@@ -46,7 +46,7 @@ build.gradle Module
 	            String str = "Hello Arduino !";
 	            arduino.sendMessage(str.getBytes());
 	        }
-    	});
+	});
     }
     
     @Override
