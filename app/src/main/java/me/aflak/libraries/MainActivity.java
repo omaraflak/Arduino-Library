@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     @Override
     public void onArduinoOpened() {
         String str = "Hello World !";
-        arduino.sendMessage(str.getBytes());
+        arduino.send(str.getBytes());
     }
 
     public void display(final String message){

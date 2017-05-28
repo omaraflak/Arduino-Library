@@ -12,6 +12,8 @@ import android.hardware.usb.UsbManager;
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
 
+import java.util.HashMap;
+
 /**
  * Created by Omar on 21/05/2017.
  */
@@ -46,6 +48,11 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         intentFilter.addAction(ACTION_USB_DEVICE_PERMISSION);
         context.registerReceiver(usbReceiver, intentFilter);
+
+        UsbDevice potential = isArduinoAttached();
+        if(potential!=null){
+            listener.onArduinoAttached(potential);
+        }
     }
 
     public void unsetArduinoListener(){
@@ -73,7 +80,7 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         context.unregisterReceiver(usbReceiver);
     }
 
-    public void sendMessage(byte[] bytes){
+    public void send(byte[] bytes){
         if(serialPort!=null){
             serialPort.write(bytes);
         }
@@ -130,6 +137,16 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
                     break;
             }
         }
+    }
+
+    private UsbDevice isArduinoAttached(){
+        HashMap<String, UsbDevice> map = usbManager.getDeviceList();
+        for (UsbDevice device : map.values()){
+            if (device.getVendorId()==ARDUINO_VENDOR_ID){
+                return device;
+            }
+        }
+        return null;
     }
 
     @Override

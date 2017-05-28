@@ -44,7 +44,7 @@ build.gradle Module
 	        public void onArduinoOpened() {
 	            // you can start the communication
 	            String str = "Hello Arduino !";
-	            arduino.sendMessage(str.getBytes());
+	            arduino.send(str.getBytes());
 	        }
         });
     }
