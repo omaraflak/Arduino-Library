@@ -1,6 +1,7 @@
 package me.aflak.libraries;
 
 import android.hardware.usb.UsbDevice;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -17,8 +18,9 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textView = (TextView) findViewById(R.id.textView);
+        textView = findViewById(R.id.textView);
         arduino = new Arduino(this);
+        display("Please plug an Arduino via OTG.\nOn some devices you will have to enable OTG Storage in the phone's settings.\n\n");
     }
 
     @Override
@@ -54,6 +56,17 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
     public void onArduinoOpened() {
         String str = "Hello World !";
         arduino.send(str.getBytes());
+    }
+
+    @Override
+    public void onUsbPermissionDenied() {
+        display("Permission denied... New attempt in 3 sec");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                arduino.reopen();
+            }
+        }, 3000);
     }
 
     public void display(final String message){

@@ -26,6 +26,7 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
     private UsbSerialDevice serialPort;
     private UsbReceiver usbReceiver;
     private UsbManager usbManager;
+    private UsbDevice lastArduinoAttached;
 
     private boolean isOpened;
 
@@ -49,9 +50,9 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         intentFilter.addAction(ACTION_USB_DEVICE_PERMISSION);
         context.registerReceiver(usbReceiver, intentFilter);
 
-        UsbDevice potential = isArduinoAttached();
-        if(potential!=null){
-            listener.onArduinoAttached(potential);
+        lastArduinoAttached = getAttachedArduino();
+        if(lastArduinoAttached!=null && listener!=null){
+            listener.onArduinoAttached(lastArduinoAttached);
         }
     }
 
@@ -66,6 +67,10 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         context.registerReceiver(usbReceiver, filter);
         usbManager.requestPermission(device, permissionIntent);
+    }
+
+    public void reopen(){
+        open(lastArduinoAttached);
     }
 
     public void close(){
@@ -90,56 +95,59 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
         @Override
         public void onReceive(Context context, Intent intent) {
             UsbDevice device;
-
-            switch (intent.getAction()){
-                case UsbManager.ACTION_USB_DEVICE_ATTACHED:
-                    device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    if (device.getVendorId()==ARDUINO_VENDOR_ID)
-                    {
-                        if(listener!=null){
-                            listener.onArduinoAttached(device);
-                        }
-                    }
-                    break;
-                case UsbManager.ACTION_USB_DEVICE_DETACHED:
-                    device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    if (device.getVendorId()==ARDUINO_VENDOR_ID)
-                    {
-                        if(listener!=null){
-                            listener.onArduinoDetached();
-                        }
-                    }
-                    break;
-                case ACTION_USB_DEVICE_PERMISSION:
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+            if(intent.getAction()!=null) {
+                switch (intent.getAction()) {
+                    case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                         device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                        if(device.getVendorId()==ARDUINO_VENDOR_ID){
-                            connection = usbManager.openDevice(device);
-                            serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection);
-                            if(serialPort != null){
-                                if(serialPort.open()){
-                                    serialPort.setBaudRate(9600);
-                                    serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
-                                    serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
-                                    serialPort.setParity(UsbSerialInterface.PARITY_NONE);
-                                    serialPort.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
-                                    serialPort.read(Arduino.this);
+                        if (device.getVendorId() == ARDUINO_VENDOR_ID) {
+                            lastArduinoAttached = device;
+                            if(listener != null){
+                                listener.onArduinoAttached(device);
+                            }
+                        }
+                        break;
+                    case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                        device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                        if (device.getVendorId() == ARDUINO_VENDOR_ID) {
+                            if(listener != null){
+                                listener.onArduinoDetached();
+                            }
+                        }
+                        break;
+                    case ACTION_USB_DEVICE_PERMISSION:
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                            if (device.getVendorId() == ARDUINO_VENDOR_ID) {
+                                connection = usbManager.openDevice(device);
+                                serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection);
+                                if (serialPort != null) {
+                                    if (serialPort.open()) {
+                                        serialPort.setBaudRate(9600);
+                                        serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
+                                        serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
+                                        serialPort.setParity(UsbSerialInterface.PARITY_NONE);
+                                        serialPort.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF);
+                                        serialPort.read(Arduino.this);
 
-                                    isOpened = true;
+                                        isOpened = true;
 
-                                    if(listener != null){
-                                        listener.onArduinoOpened();
+                                        if(listener != null){
+                                            listener.onArduinoOpened();
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    break;
+                        else if(listener!=null){
+                            listener.onUsbPermissionDenied();
+                        }
+                        break;
+                }
             }
         }
     }
 
-    private UsbDevice isArduinoAttached(){
+    private UsbDevice getAttachedArduino(){
         HashMap<String, UsbDevice> map = usbManager.getDeviceList();
         for (UsbDevice device : map.values()){
             if (device.getVendorId()==ARDUINO_VENDOR_ID){

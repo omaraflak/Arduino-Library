@@ -11,4 +11,5 @@ public interface ArduinoListener {
     void onArduinoDetached();
     void onArduinoMessage(byte[] bytes);
     void onArduinoOpened();
+    void onUsbPermissionDenied();
 }
