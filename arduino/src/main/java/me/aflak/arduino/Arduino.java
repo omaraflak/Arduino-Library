@@ -28,17 +28,27 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
     private UsbManager usbManager;
     private UsbDevice lastArduinoAttached;
 
+    private int baudRate;
     private boolean isOpened;
 
     private static final String ACTION_USB_DEVICE_PERMISSION = "me.aflak.arduino.USB_PERMISSION";
     private static final int ARDUINO_VENDOR_ID = 9025;
+    private static final int DEFAULT_BAUD_RATE = 9600;
 
-    public Arduino(Context context) {
+    public Arduino(Context context, int baudRate) {
+        init(context, baudRate);
+    }
+
+    public Arduino(Context context){
+        init(context, DEFAULT_BAUD_RATE);
+    }
+
+    private void init(Context context, int baudRate){
         this.context = context;
-        usbReceiver = new UsbReceiver();
-        usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-
-        isOpened = false;
+        this.usbReceiver = new UsbReceiver();
+        this.usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        this.baudRate = baudRate;
+        this.isOpened = false;
     }
 
     public void setArduinoListener(ArduinoListener listener){
@@ -122,7 +132,7 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback{
                                 serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection);
                                 if (serialPort != null) {
                                     if (serialPort.open()) {
-                                        serialPort.setBaudRate(9600);
+                                        serialPort.setBaudRate(baudRate);
                                         serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
                                         serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
                                         serialPort.setParity(UsbSerialInterface.PARITY_NONE);
