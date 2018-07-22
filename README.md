@@ -70,6 +70,15 @@ protected void onDestroy() {
 }
 ```
 
+# Custom vendor id
+
+The library currently filters the vendor id 9025, but you can add your own filter by calling :
+
+```java
+Arduino arduino = new Arduino(Context);
+arduino.addVendorId(1234);
+```
+
 # Arduino Side
 
 Example code which sends back every character received
