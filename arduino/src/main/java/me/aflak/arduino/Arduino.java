@@ -13,6 +13,9 @@ import android.util.Log;
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,9 +35,9 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
 
     private int baudRate;
     private boolean isOpened;
+    private List<Integer> vendorIds;
 
     private static final String ACTION_USB_DEVICE_PERMISSION = "me.aflak.arduino.USB_PERMISSION";
-    private static final int[] ARDUINO_VENDOR_IDS = {0x9025, 0x0403};
     private static final int DEFAULT_BAUD_RATE = 9600;
 
     public Arduino(Context context, int baudRate) {
@@ -51,6 +54,8 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         this.usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         this.baudRate = baudRate;
         this.isOpened = false;
+        this.vendorIds = new ArrayList<>();
+        this.vendorIds.add(9025);
     }
 
     public void setArduinoListener(ArduinoListener listener) {
@@ -101,6 +106,10 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         if (serialPort != null) {
             serialPort.write(bytes);
         }
+    }
+
+    public void addVendorId(int id){
+        vendorIds.add(id);
     }
 
     private class UsbReceiver extends BroadcastReceiver {
@@ -180,9 +189,9 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
     }
 
     private boolean hasId(int id) {
-        Log.d("TEST ID", id+"");
-        for(int i=0  ; i<ARDUINO_VENDOR_IDS.length ; i++){
-            if(ARDUINO_VENDOR_IDS[i]==id){
+        Log.i(getClass().getSimpleName(), "Vendor id : "+id);
+        for(int vendorId : vendorIds){
+            if(vendorId==id){
                 return true;
             }
         }
