@@ -13,11 +13,11 @@ ext {
     siteUrl = 'https://github.com/omaflak/Arduino'
     gitUrl = 'https://github.com/omaflak/Arduino.git'
 
-    libraryVersion = '1.4.2'
+    libraryVersion = '1.4.3'
 
     developerId = 'omaflak'
     developerName = 'Omar Aflak'
-    developerEmail = 'aflakomar@hotmail.fr'
+    developerEmail = 'aflakomar@gmail.com'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
@@ -31,7 +31,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 7
-        versionName "1.4.2"
+        versionName "1.4.3"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -52,7 +52,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
 
-    api 'com.github.felHR85:UsbSerial:4.5'
+    compile 'com.github.felHR85:UsbSerial:4.5'
 }
 
 apply from: 'https://raw.githubusercontent.com/omaflak/Bintray/master/install.gradle'
