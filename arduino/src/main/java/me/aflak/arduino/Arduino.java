@@ -13,7 +13,9 @@ import android.util.Log;
 import com.felhr.usbserial.UsbSerialDevice;
 import com.felhr.usbserial.UsbSerialInterface;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,9 +36,12 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
     private int baudRate;
     private boolean isOpened;
     private List<Integer> vendorIds;
+    private List<Byte> bytesReceived;
+    private byte delimiter;
 
     private static final String ACTION_USB_DEVICE_PERMISSION = "me.aflak.arduino.USB_PERMISSION";
     private static final int DEFAULT_BAUD_RATE = 9600;
+    private static final byte DEFAULT_DELIMITER = '\n';
 
     public Arduino(Context context, int baudRate) {
         init(context, baudRate);
@@ -54,6 +59,8 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         this.isOpened = false;
         this.vendorIds = new ArrayList<>();
         this.vendorIds.add(9025);
+        this.bytesReceived = new ArrayList<>();
+        this.delimiter = DEFAULT_DELIMITER;
     }
 
     public void setArduinoListener(ArduinoListener listener) {
@@ -104,6 +111,14 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         if (serialPort != null) {
             serialPort.write(bytes);
         }
+    }
+
+    public void setDelimiter(byte delimiter){
+        this.delimiter = delimiter;
+    }
+
+    public void setBaudRate(int baudRate){
+        this.baudRate = baudRate;
     }
 
     public void addVendorId(int id){
@@ -175,10 +190,55 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         return null;
     }
 
+    private List<Integer> indexOf(byte[] bytes, byte b){
+        List<Integer> idx = new ArrayList<>();
+        for(int i=0 ; i<bytes.length ; i++){
+            if(bytes[i] == b){
+                idx.add(i);
+            }
+        }
+        return idx;
+    }
+
+    private List<Byte> toByteList(byte[] bytes){
+        List<Byte> list = new ArrayList<>();
+        for(byte b : bytes){
+            list.add(b);
+        }
+        return list;
+    }
+
+    private byte[] toByteArray(List<Byte> bytes){
+        byte[] array = new byte[bytes.size()];
+        for(int i=0 ; i<bytes.size() ; i++){
+            array[i] = bytes.get(i);
+        }
+        return array;
+    }
+
     @Override
     public void onReceivedData(byte[] bytes) {
-        if (listener != null && bytes.length != 0) {
-            listener.onArduinoMessage(bytes);
+        if (bytes.length != 0) {
+            List<Integer> idx = indexOf(bytes, delimiter);
+            if(idx.isEmpty()){
+                bytesReceived.addAll(toByteList(bytes));
+            } else{
+                int offset = 0;
+                for(int index : idx){
+                    byte[] tmp = Arrays.copyOfRange(bytes, offset, index);
+                    bytesReceived.addAll(toByteList(tmp));
+                    if(listener != null) {
+                        listener.onArduinoMessage(toByteArray(bytesReceived));
+                    }
+                    bytesReceived.clear();
+                    offset += index + 1;
+                }
+
+                if(offset < bytes.length - 1){
+                    byte[] tmp = Arrays.copyOfRange(bytes, offset, bytes.length);
+                    bytesReceived.addAll(toByteList(tmp));
+                }
+            }
         }
     }
 
