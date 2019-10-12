@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AndroidStudio-Arduino-Library.iml" filepath="$PROJECT_DIR$/AndroidStudio-Arduino-Library.iml" group="Arduino-Library" />
-      <module fileurl="file://$PROJECT_DIR$/AndroidStudioProjects-Arduino-Library.iml" filepath="$PROJECT_DIR$/AndroidStudioProjects-Arduino-Library.iml" group="Arduino-Library" />
-      <module fileurl="file://$PROJECT_DIR$/Arduino-Library.iml" filepath="$PROJECT_DIR$/Arduino-Library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/Arduino-Library-app.iml" filepath="$PROJECT_DIR$/app/Arduino-Library-app.iml" group="Arduino-Library/app" />
-      <module fileurl="file://$PROJECT_DIR$/arduino/Arduino-Library-arduino.iml" filepath="$PROJECT_DIR$/arduino/Arduino-Library-arduino.iml" group="Arduino-Library/arduino" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/arduino/arduino.iml" filepath="$PROJECT_DIR$/arduino/arduino.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Arduino-Library.iml" filepath="$PROJECT_DIR$/Arduino-Library.iml" group="Arduino-Library" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="Arduino-Library/app" />
+      <module fileurl="file://$PROJECT_DIR$/arduino/arduino.iml" filepath="$PROJECT_DIR$/arduino/arduino.iml" group="Arduino-Library/arduino" />
     </modules>
   </component>
 </project>

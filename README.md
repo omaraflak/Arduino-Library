@@ -17,7 +17,7 @@ allprojects {
 build.gradle Module
 
 ```gradle
-compile 'me.aflak.libraries:arduino:1.4.3'
+implementation 'me.aflak.libraries:arduino:1.4.4'
 ```
 
 # Usage
