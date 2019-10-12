@@ -79,6 +79,15 @@ Arduino arduino = new Arduino(Context);
 arduino.addVendorId(1234);
 ```
 
+# Custom delimiter while reading
+
+You can set a custom delimiter byte (default is `\n`) :
+
+```java
+Arduino arduino = new Arduino(Context);
+arduino.setDelimiter(';');
+```
+
 # Arduino Side
 
 Example code which sends back every character received
