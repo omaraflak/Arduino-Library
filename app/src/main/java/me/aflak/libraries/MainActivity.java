@@ -4,6 +4,8 @@ import android.hardware.usb.UsbDevice;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.widget.TextView;
 
 import me.aflak.arduino.Arduino;
@@ -19,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
         setContentView(R.layout.activity_main);
 
         textView = findViewById(R.id.textView);
+        textView.setMovementMethod(new ScrollingMovementMethod());
         arduino = new Arduino(this);
         display("Please plug an Arduino via OTG.\nOn some devices you will have to enable OTG Storage in the phone's settings.\n\n");
     }
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements ArduinoListener {
 
     @Override
     public void onArduinoMessage(byte[] bytes) {
-        display("Received: "+new String(bytes));
+        display("> "+new String(bytes));
     }
 
     @Override
