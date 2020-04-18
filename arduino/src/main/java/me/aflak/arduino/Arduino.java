@@ -224,6 +224,9 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
             } else{
                 int offset = 0;
                 for(int index : idx){
+                    if (index < offset) {
+                        continue;
+                    }
                     byte[] tmp = Arrays.copyOfRange(bytes, offset, index);
                     bytesReceived.addAll(toByteList(tmp));
                     if(listener != null) {
