@@ -230,10 +230,10 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
                         listener.onArduinoMessage(toByteArray(bytesReceived));
                     }
                     bytesReceived.clear();
-                    offset += index + 1;
+                    offset = index + 1;
                 }
 
-                if(offset < bytes.length - 1){
+                if(offset < bytes.length){
                     byte[] tmp = Arrays.copyOfRange(bytes, offset, bytes.length);
                     bytesReceived.addAll(toByteList(tmp));
                 }
