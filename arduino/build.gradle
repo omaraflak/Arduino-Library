@@ -8,12 +8,12 @@ ext {
     libraryName = 'Arduino'
     artifact = 'arduino'
 
-    libraryDescription = 'A short Android library to communicate with Arduino through usb.'
+    libraryDescription = 'A lightweight Android library to communicate with Arduino through USB.'
 
     siteUrl = 'https://github.com/omaflak/Arduino'
     gitUrl = 'https://github.com/omaflak/Arduino.git'
 
-    libraryVersion = '1.4.4'
+    libraryVersion = '1.4.5'
 
     developerId = 'omaflak'
     developerName = 'Omar Aflak'
@@ -25,15 +25,15 @@ ext {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 28
-        versionCode 7
-        versionName "1.4.4"
+        targetSdkVersion 30
+        versionCode 8
+        versionName "1.4.5"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
     }
     buildTypes {
@@ -46,11 +46,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.2', {
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
 
     api 'com.github.felHR85:UsbSerial:6.1.0'
 }

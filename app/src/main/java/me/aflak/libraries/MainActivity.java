@@ -2,10 +2,9 @@ package me.aflak.libraries;
 
 import android.hardware.usb.UsbDevice;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.widget.TextView;
 
 import me.aflak.arduino.Arduino;

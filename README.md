@@ -1,5 +1,5 @@
 # Arduino [ ![Download](https://api.bintray.com/packages/omaflak/maven/arduino/images/download.svg) ](https://bintray.com/omaflak/maven/arduino/_latestVersion)
-A short Android library to communicate with Arduino through usb.
+A lightweight Android library to communicate with Arduino through USB.
 
 # Gradle
 
@@ -17,7 +17,7 @@ allprojects {
 build.gradle Module
 
 ```gradle
-implementation 'me.aflak.libraries:arduino:1.4.4'
+implementation 'me.aflak.libraries:arduino:1.4.5'
 ```
 
 # Usage
