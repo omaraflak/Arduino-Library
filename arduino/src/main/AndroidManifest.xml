@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
-    package="me.aflak.arduino">
+    >
 
     <uses-feature android:name="android.hardware.usb.host" />
 
