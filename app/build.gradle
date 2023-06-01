@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "me.aflak.libraries"
         minSdkVersion 15
-        targetSdkVersion 30
-        versionCode 1
+        targetSdkVersion 31
+        versionCode 2
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }

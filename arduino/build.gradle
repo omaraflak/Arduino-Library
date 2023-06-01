@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/omaflak/Arduino'
     gitUrl = 'https://github.com/omaflak/Arduino.git'
 
-    libraryVersion = '1.4.5'
+    libraryVersion = '1.4.6'
 
     developerId = 'omaflak'
     developerName = 'Omar Aflak'
@@ -25,13 +25,13 @@ ext {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 30
-        versionCode 8
-        versionName "1.4.5"
+        targetSdkVersion 31
+        versionCode 9
+        versionName "1.4.6"
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
