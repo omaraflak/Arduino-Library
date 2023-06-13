@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Omar on 21/05/2017.
@@ -34,7 +35,7 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
 
     private int baudRate;
     private boolean isOpened;
-    private List<Integer> vendorIds;
+    private List<String> vendorIds;
     private List<Byte> bytesReceived;
     private byte delimiter;
 
@@ -57,7 +58,14 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         this.baudRate = baudRate;
         this.isOpened = false;
         this.vendorIds = new ArrayList<>();
-        this.vendorIds.add(9025);
+        this.vendorIds.add("9025");
+        this.vendorIds.add("1027");
+        this.vendorIds.add("5824");
+        this.vendorIds.add("4292");
+        this.vendorIds.add("1659");
+        this.vendorIds.add("4966");
+        this.vendorIds.add("1A86");
+
         this.bytesReceived = new ArrayList<>();
         this.delimiter = DEFAULT_DELIMITER;
     }
@@ -112,15 +120,15 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         }
     }
 
-    public void setDelimiter(byte delimiter){
+    public void setDelimiter(byte delimiter) {
         this.delimiter = delimiter;
     }
 
-    public void setBaudRate(int baudRate){
+    public void setBaudRate(int baudRate) {
         this.baudRate = baudRate;
     }
 
-    public void addVendorId(int id){
+    public void addVendorId(String id) {
         vendorIds.add(id);
     }
 
@@ -132,7 +140,7 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
                 switch (intent.getAction()) {
                     case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                         device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                        if (hasId(device.getVendorId())) {
+                        if (hasId(String.valueOf(device.getVendorId()))) {
                             lastArduinoAttached = device;
                             if (listener != null) {
                                 listener.onArduinoAttached(device);
@@ -141,7 +149,7 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
                         break;
                     case UsbManager.ACTION_USB_DEVICE_DETACHED:
                         device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                        if (hasId(device.getVendorId())) {
+                        if (hasId(String.valueOf(device.getVendorId()))) {
                             if (listener != null) {
                                 listener.onArduinoDetached();
                             }
@@ -150,7 +158,7 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
                     case ACTION_USB_DEVICE_PERMISSION:
                         if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                             device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                            if (hasId(device.getVendorId())) {
+                            if (hasId(String.valueOf(device.getVendorId()))) {
                                 connection = usbManager.openDevice(device);
                                 serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection);
                                 if (serialPort != null) {
@@ -182,34 +190,34 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
     private UsbDevice getAttachedArduino() {
         HashMap<String, UsbDevice> map = usbManager.getDeviceList();
         for (UsbDevice device : map.values()) {
-            if (hasId(device.getVendorId())) {
+            if (hasId(String.valueOf(device.getVendorId()))) {
                 return device;
             }
         }
         return null;
     }
 
-    private List<Integer> indexOf(byte[] bytes, byte b){
+    private List<Integer> indexOf(byte[] bytes, byte b) {
         List<Integer> idx = new ArrayList<>();
-        for(int i=0 ; i<bytes.length ; i++){
-            if(bytes[i] == b){
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] == b) {
                 idx.add(i);
             }
         }
         return idx;
     }
 
-    private List<Byte> toByteList(byte[] bytes){
+    private List<Byte> toByteList(byte[] bytes) {
         List<Byte> list = new ArrayList<>();
-        for(byte b : bytes){
+        for (byte b : bytes) {
             list.add(b);
         }
         return list;
     }
 
-    private byte[] toByteArray(List<Byte> bytes){
+    private byte[] toByteArray(List<Byte> bytes) {
         byte[] array = new byte[bytes.size()];
-        for(int i=0 ; i<bytes.size() ; i++){
+        for (int i = 0; i < bytes.size(); i++) {
             array[i] = bytes.get(i);
         }
         return array;
@@ -219,21 +227,21 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
     public void onReceivedData(byte[] bytes) {
         if (bytes.length != 0) {
             List<Integer> idx = indexOf(bytes, delimiter);
-            if(idx.isEmpty()){
+            if (idx.isEmpty()) {
                 bytesReceived.addAll(toByteList(bytes));
-            } else{
+            } else {
                 int offset = 0;
-                for(int index : idx){
+                for (int index : idx) {
                     byte[] tmp = Arrays.copyOfRange(bytes, offset, index);
                     bytesReceived.addAll(toByteList(tmp));
-                    if(listener != null) {
+                    if (listener != null) {
                         listener.onArduinoMessage(toByteArray(bytesReceived));
                     }
                     bytesReceived.clear();
                     offset = index + 1;
                 }
 
-                if(offset < bytes.length){
+                if (offset < bytes.length) {
                     byte[] tmp = Arrays.copyOfRange(bytes, offset, bytes.length);
                     bytesReceived.addAll(toByteList(tmp));
                 }
@@ -245,10 +253,10 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         return isOpened;
     }
 
-    private boolean hasId(int id) {
-        Log.i(getClass().getSimpleName(), "Vendor id : "+id);
-        for(int vendorId : vendorIds){
-            if(vendorId==id){
+    private boolean hasId(String id) {
+        Log.i(getClass().getSimpleName(), "Vendor id : " + id);
+        for (String vendorId : vendorIds) {
+            if (Objects.equals(vendorId, id)) {
                 return true;
             }
         }
